@@ -38,6 +38,25 @@ The application consists of two main components:
   - Console Application
   - Entity Framework
 
+## Screenshots
+
+### Splash Window
+![Splash Window](Docs/assets/SplashWindow.png)
+
+### Login
+![Login Page](Docs/assets/LoginPage.png)
+
+### Main
+![Main Page](Docs/assets/MainPage.png)
+
+### DashBoard
+![DashBoard](Docs/assets/DashBoardPage1.png)
+![DashBoard](Docs/assets/DashBoardPage2.png)
+
+### Configuration
+![ConfigurationPage](Docs/assets/ConfigurationPage.png)
+
+
 ## Getting Started
 
 To get started with CommitCompiler, clone the repository and follow the setup instructions:
