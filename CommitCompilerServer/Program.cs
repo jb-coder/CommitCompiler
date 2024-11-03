@@ -1,9 +1,13 @@
 ﻿using CommitCompilerShared.Data;
-using Microsoft.EntityFrameworkCore;
+using CommitCompilerShared.Services;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
+        CommitCompilerContext context = new CommitCompilerContext();
+        var buildService = new BuildService(context);
+
+        await buildService.ExecuteBuildProcess();
     }
 }
