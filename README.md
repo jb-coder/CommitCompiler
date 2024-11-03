@@ -41,20 +41,20 @@ The application consists of two main components:
 ## Screenshots
 
 ### Splash Window
-![Splash Window](Docs/assets/SplashWindow.png)
+![Splash Window](Docs/Assets/SplashWindow.png)
 
 ### Login
-![Login Page](Docs/assets/LoginPage.png)
+![Login Page](Docs/Assets/LoginPage.png)
 
 ### Main
-![Main Page](Docs/assets/MainPage.png)
+![Main Page](Docs/Assets/MainPage.png)
 
 ### DashBoard
-![DashBoard](Docs/assets/DashBoardPage1.png)
-![DashBoard](Docs/assets/DashBoardPage2.png)
+![DashBoard](Docs/Assets/DashBoardPage1.png)
+![DashBoard](Docs/Assets/DashBoardPage2.png)
 
 ### Configuration
-![ConfigurationPage](Docs/assets/ConfigurationPage.png)
+![ConfigurationPage](Docs/Assets/ConfigurationPage.png)
 
 
 ## Getting Started
