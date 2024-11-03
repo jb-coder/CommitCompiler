@@ -32,7 +32,8 @@ The application consists of two main components:
   - Entity Framework
   - HandyControl
   - LiveCharts
-
+  - Xunit
+  - Moq
 - **Server:** 
   - .NET 6
   - Console Application
