@@ -1,4 +1,5 @@
 # CommitCompiler
+![Logo](CommitCompilerClient/Resources/LogoCommitCompiler.png)
 
 CommitCompiler is a client-server application designed to streamline the management of projects and repositories within your Azure organization. This tool automates the merging of branches, generates builds to a specified destination, and provides insightful dashboards for monitoring.
 
