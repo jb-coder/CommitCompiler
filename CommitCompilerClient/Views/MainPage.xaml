@@ -5,44 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CommitCompiler.Views"
         mc:Ignorable="d"
-        Height="565" Width="850"
+        Height="560" Width="845"
         Background="Transparent">
 
-    <Border CornerRadius="12">
-        <Border.Background>
-            <ImageBrush
-                        Stretch="None"/>
-        </Border.Background>
+    <Grid Grid.Row="1">
 
-        <Border CornerRadius="10"                    
-            BorderThickness="2"
-            Opacity="0.95">
-
-            <Border.BorderBrush>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FF1917A9" Offset="0"/>
-                    <GradientStop Color="#FF2E2DC9" Offset="0.75"/>
-                    <GradientStop Color="#FF1690C1" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.BorderBrush>
-
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                    <GradientStop Color="#060531" Offset="0"/>
-                    <GradientStop Color="#FF3660CE" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-
-            <Grid Grid.Row="1">
-
-                <!--<Grid HorizontalAlignment="Left" Height="400" Margin="228,55,0,0" Grid.Row="1" VerticalAlignment="Top" Width="573">-->
-                    <Image HorizontalAlignment="center" Height="166" VerticalAlignment="Center" Width="176" Source="/Resources/LogoCommitCompiler.png" RenderTransformOrigin="0.504,0.482"/>
-                <!--</Grid>-->
-
-            </Grid>
-
-        </Border>
-
-    </Border>
-
+        <!--<Grid HorizontalAlignment="Left" Height="400" Margin="228,55,0,0" Grid.Row="1" VerticalAlignment="Top" Width="573">-->
+            <Image HorizontalAlignment="center" Height="166" VerticalAlignment="Center" Width="176" Source="/Resources/LogoCommitCompiler.png" RenderTransformOrigin="0.504,0.482"/>
+        <!--</Grid>-->
+    </Grid>
 </Page>

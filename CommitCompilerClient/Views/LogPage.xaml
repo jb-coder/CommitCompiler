@@ -6,49 +6,23 @@
              xmlns:local="clr-namespace:CommitCompiler.Views"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              mc:Ignorable="d"
-             Height="565" Width="850"
+             Height="560" Width="845"
              Background="Transparent">
 
-    <Border CornerRadius="12">
-        <Border.Background>
-            <ImageBrush Stretch="None"/>
-        </Border.Background>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Border CornerRadius="10"
-                BorderThickness="2"
-                Opacity="0.95">
+        <TextBlock HorizontalAlignment="Center" Height="25" TextWrapping="Wrap" Text="Log" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Foreground="White" Grid.Row="0"/>
 
-            <Border.BorderBrush>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FF1917A9" Offset="0"/>
-                    <GradientStop Color="#FF2E2DC9" Offset="0.75"/>
-                    <GradientStop Color="#FF1690C1" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.BorderBrush>
+        <Border Background="#0B37B4" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="616" Height="500" CornerRadius="5" Grid.Row="1">
+            <Border CornerRadius="8" BorderThickness="2" BorderBrush="Gray">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
 
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                    <GradientStop Color="#060531" Offset="0"/>
-                    <GradientStop Color="#FF3660CE" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <TextBlock HorizontalAlignment="Center" Height="25" TextWrapping="Wrap" Text="Configuración" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Foreground="White" Grid.Row="0"/>
-
-                <Border Background="#0B37B4" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="616" CornerRadius="5" Grid.Row="1">
-                    <Border CornerRadius="8" BorderThickness="2" BorderBrush="Gray">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-
-                        </ScrollViewer>
-                    </Border>
-                </Border>
-            </Grid>
+                </ScrollViewer>
+            </Border>
         </Border>
-    </Border>
+    </Grid>
 </Page>

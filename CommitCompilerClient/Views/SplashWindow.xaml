@@ -7,49 +7,24 @@
         Background="Transparent"
         WindowStartupLocation="CenterScreen"
         Height="150" Width="300">
+    
+    <Border Style="{StaticResource MainWindowBorderStyle}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
 
-    <Border CornerRadius="12">
-
-
-        <Border CornerRadius="10" BorderThickness="2" Opacity="0.95">
-            <Border.BorderBrush>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FF1917A9" Offset="0"/>
-                    <GradientStop Color="#FF2E2DC9" Offset="0.75"/>
-                    <GradientStop Color="#FF1690C1" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.BorderBrush>
-
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                    <GradientStop Color="#060531" Offset="0"/>
-                    <GradientStop Color="#FF3660CE" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-            
-            <!--<StackPanel>
-                <Grid HorizontalAlignment="Left" Height="400" Margin="228,55,0,0" Grid.Row="1" VerticalAlignment="Top" Width="573">
-                    <Image HorizontalAlignment="Left" Height="166" Margin="163,81,0,0" VerticalAlignment="Top" Width="176" Source="/Resources/LogoCommitCompiler.png" RenderTransformOrigin="0.504,0.482"/>
-                </Grid>
-            </StackPanel>-->
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="70"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Row="0">
-                    <Image HorizontalAlignment="Center" Height="50"  Width="50" Margin="0,10,0,0" VerticalAlignment="Top" Source="/Resources/LogoCommitCompiler.png" />
-                </Grid>
-
-                <Grid Grid.Row="1">
-                    <ProgressBar Style="{StaticResource ProgressBarFlat}" Margin="0,-50,0,10" Value="110" Maximum="200" IsIndeterminate="True"/>
-                    <TextBlock Text="Loading..." FontSize="14" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Center"  Margin="0,-20,0,0" />
-                    <TextBlock Text="Versión: 0.0.2" FontSize="14" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Center"  Margin="0,15,0,0" />
-                    <TextBlock Text="Design by Jb-Coder" FontSize="12" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0"/>
-                </Grid>
+            <Grid Grid.Row="0">
+                <Image HorizontalAlignment="Center" Height="50"  Width="50" Margin="0,10,0,0" VerticalAlignment="Top" Source="/Resources/LogoCommitCompiler.png" />
             </Grid>
 
-        </Border>
+            <Grid Grid.Row="1">
+                <ProgressBar Style="{StaticResource ProgressBarFlat}" Margin="0,-50,0,10" Value="110" Maximum="200" IsIndeterminate="True"/>
+                <TextBlock Text="Loading..." FontSize="14" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Center"  Margin="0,-20,0,0" />
+                <TextBlock Text="Versión: 0.0.2" FontSize="14" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Center"  Margin="0,15,0,0" />
+                <TextBlock Text="Design by Jb-Coder" FontSize="12" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0"/>
+            </Grid>
+        </Grid>
     </Border>
 </Window>

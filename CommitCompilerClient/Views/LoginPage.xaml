@@ -13,26 +13,7 @@
         AllowsTransparency="True"
         MouseDown="Window_MouseDown">
 
-    <Border CornerRadius="12">
-        <!--<Border.Background>
-            <ImageBrush ImageSource="/Resources/logo.png" Stretch="None"/>
-        </Border.Background>-->
-
-        <Border CornerRadius="10" BorderThickness="2" Opacity="0.95">
-            <Border.BorderBrush>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FF1917A9" Offset="0"/>
-                    <GradientStop Color="#FF2E2DC9" Offset="0.75"/>
-                    <GradientStop Color="#FF1690C1" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.BorderBrush>
-
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                    <GradientStop Color="#060531" Offset="0"/>
-                    <GradientStop Color="#FF3660CE" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
+    <Border Style="{StaticResource MainWindowBorderStyle}">
             <!-- Contenedor principal que maneja el contenido -->
             <Grid>
                 <Grid.RowDefinitions>
@@ -239,5 +220,4 @@
                 </StackPanel>
             </Grid>
         </Border>
-    </Border>
 </Window>

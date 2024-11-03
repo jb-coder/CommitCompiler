@@ -8,156 +8,130 @@
         Background="Transparent"
         AllowsTransparency="True"
         MouseDown="Window_MouseDown">
-    <Window.Resources>
-        <!-- Importa los estilos -->
-        <ResourceDictionary Source="/CommitCompilerClient;component/Resources/Styles.xaml"/>
-    </Window.Resources>
-    <Border CornerRadius="12">
-        <!-- Configuración del fondo de la ventana -->
-        <!--<Border.Background>
-            <ImageBrush ImageSource="/Resources/logo.png" Stretch="None"/>
-        </Border.Background>-->
 
-        <Border CornerRadius="10" BorderThickness="2" Opacity="0.95">
-            <Border.BorderBrush>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FF1917A9" Offset="0"/>
-                    <GradientStop Color="#FF2E2DC9" Offset="0.75"/>
-                    <GradientStop Color="#FF1690C1" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.BorderBrush>
+    <Border Style="{StaticResource MainWindowBorderStyle}">
+        <!-- Contenedor principal que maneja el contenido -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                    <GradientStop Color="#060531" Offset="0"/>
-                    <GradientStop Color="#FF3660CE" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
+            <!-- Barra superior con icono de menú, minimizar y cerrar -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="25"/>
+                    <ColumnDefinition Width="25"/>
+                    <ColumnDefinition Width="5"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Contenedor principal que maneja el contenido -->
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="35"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                <!-- Botón de menú estilo hamburguesa para abrir el menú lateral -->
+                <Button x:Name="MenuButton" Content="☰" FontSize="16" Foreground="White"
+                        Background="Transparent" BorderBrush="Transparent" Click="MenuButton_Click" Height="34" />
 
-                <!-- Barra superior con icono de menú, minimizar y cerrar -->
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="25"/>
-                        <ColumnDefinition Width="25"/>
-                        <ColumnDefinition Width="5"/>
-                    </Grid.ColumnDefinitions>
+                <!-- Título de la ventana -->
+                <TextBlock Text="CommitCompiler"
+                            Foreground="DarkGray"
+                            FontSize="10"
+                            FontFamily="Montserrat"
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Margin="10,0,0,0"/>
 
-                    <!-- Botón de menú estilo hamburguesa para abrir el menú lateral -->
-                    <Button x:Name="MenuButton" Content="☰" FontSize="16" Foreground="White"
-                            Background="Transparent" BorderBrush="Transparent"
-                            VerticalAlignment="Center" Click="MenuButton_Click" />
+                <!-- Botón de minimizar -->
+                <Button x:Name="btnMinimize"
+                        BorderThickness="0"
+                        Content="-"
+                        Foreground="White"
+                        FontSize="16"
+                        Cursor="Hand"
+                        Grid.Column="2"
+                        Click="btnMinimize_Click">
+                    <!-- Estilo y template personalizados para el botón de minimizar -->
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="#28AEED"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#278BEF"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Width="18" Height="18"
+                    CornerRadius="9"
+                    Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center"
+                                HorizontalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
 
-                    <!-- Título de la ventana -->
-                    <TextBlock Text="CommitCompiler"
-                               Foreground="DarkGray"
-                               FontSize="10"
-                               FontFamily="Montserrat"
-                               Grid.Column="1"
-                               VerticalAlignment="Center"
-                               Margin="10,0,0,0"/>
+                </Button>
 
-                    <!-- Botón de minimizar -->
-                    <Button x:Name="btnMinimize"
-                            BorderThickness="0"
-                            Content="-"
-                            Foreground="White"
-                            FontSize="16"
-                            Cursor="Hand"
-                            Grid.Column="2"
-                            Click="btnMinimize_Click">
-                        <!-- Estilo y template personalizados para el botón de minimizar -->
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="#28AEED"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#278BEF"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border Width="18" Height="18"
-                        CornerRadius="9"
-                        Background="{TemplateBinding Background}">              
-                                    <ContentPresenter VerticalAlignment="Center"
-                                  HorizontalAlignment="Center"/>
-                                </Border>
-                            </ControlTemplate>
-                        </Button.Template>
+                <!-- Botón de cerrar -->
+                <Button x:Name="btnClose"
+                        BorderThickness="0"
+                        Content="X"
+                        Foreground="White"
+                        FontSize="12"
+                        Cursor="Hand"
+                        Grid.Column="3"
+                        Click="btnClose_Click">
+                    <!-- Estilo y template personalizados para el botón de cerrar -->
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="#FF1917A9"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#FF2A28C9"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Width="18" Height="18"
+                                    CornerRadius="9"
+                                    Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center"
+                                HorizontalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
 
-                    </Button>
-
-                    <!-- Botón de cerrar -->
-                    <Button x:Name="btnClose"
-                            BorderThickness="0"
-                            Content="X"
-                            Foreground="White"
-                            FontSize="12"
-                            Cursor="Hand"
-                            Grid.Column="3"
-                            Click="btnClose_Click">
-                        <!-- Estilo y template personalizados para el botón de cerrar -->
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="#FF1917A9"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#FF2A28C9"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border Width="18" Height="18"
-                                        CornerRadius="9"
-                                        Background="{TemplateBinding Background}">
-                                    <ContentPresenter VerticalAlignment="Center"
-                                  HorizontalAlignment="Center"/>
-                                </Border>
-                            </ControlTemplate>
-                        </Button.Template>
-
-                    </Button>
-                </Grid>
-                <!--<StackPanel Grid.Row="1" DockPanel.Dock="Top" Orientation="Horizontal" Background="#FF4A90E2" Height="50"/>-->
-
-                <!-- Contenedor principal para el menú lateral y contenido -->
-                <Canvas Grid.Row="1">
-
-                            <!-- Menú lateral deslizante -->
-                        <Grid x:Name="FlyoutMenu" Width="200" Height="560" Background="#1A2D4B" Canvas.ZIndex="1"
-                          HorizontalAlignment="Left" RenderTransformOrigin="0,0" >
-                            <Grid.RenderTransform>
-                                <TranslateTransform x:Name="MenuTransform" X="-200"/>
-                            </Grid.RenderTransform>
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <Button x:Name="btnInicio" Content="Inicio" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding InicioCommand}" CommandParameter="MainPage"/>
-                                <Button x:Name="btnDashBoard" Content="DashBoard" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding DashBoardCommand}" CommandParameter="DashBoardPage"/>
-                            <Button x:Name="btnProcess" Content="Procesos" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding ProcessCommand}" CommandParameter="ProcessPage"/>
-                            <Button x:Name="btnConfiguration" Content="Configuración" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding ConfigurationCommand}" CommandParameter="ConfigurationPage"/>
-                            <Button x:Name="btnLog" Content="Log" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding LogCommand}" CommandParameter="ConfigurationPage"/>
-                        </StackPanel>
-                        </Grid>
-
-                    <Frame Grid.Column="1" x:Name="MainFrame" Content="{Binding}" 
-                           HorizontalAlignment="Center" 
-                           VerticalAlignment="Center" 
-                           NavigationUIVisibility="Hidden" Canvas.ZIndex="0" />
-                </Canvas>
-
+                </Button>
             </Grid>
-        </Border>
+            <!--<StackPanel Grid.Row="1" DockPanel.Dock="Top" Orientation="Horizontal" Background="#FF4A90E2" Height="50"/>-->
+
+            <!-- Contenedor principal para el menú lateral y contenido -->
+            <Canvas Grid.Row="1">
+
+                <!-- Menú lateral deslizante -->
+                <Grid x:Name="FlyoutMenu" Width="200" Height="560" Background="#1A2D4B" Canvas.ZIndex="1"
+                        HorizontalAlignment="Left" RenderTransformOrigin="0,0" >
+                    <Grid.RenderTransform>
+                        <TranslateTransform x:Name="MenuTransform" X="-200"/>
+                    </Grid.RenderTransform>
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <Button x:Name="btnInicio" Content="Inicio" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding InicioCommand}" CommandParameter="MainPage"/>
+                        <Button x:Name="btnDashBoard" Content="DashBoard" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding DashBoardCommand}" CommandParameter="DashBoardPage"/>
+                        <Button x:Name="btnProcess" Content="Procesos" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding ProcessCommand}" CommandParameter="ProcessPage"/>
+                        <Button x:Name="btnConfiguration" Content="Configuración" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding ConfigurationCommand}" CommandParameter="ConfigurationPage"/>
+                        <Button x:Name="btnLog" Content="Log" Style="{StaticResource ModernMenuButtonStyle}" Command="{Binding LogCommand}" CommandParameter="ConfigurationPage"/>
+                    </StackPanel>
+                </Grid>
+
+                <Frame Grid.Column="1" x:Name="MainFrame" Content="{Binding}" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center" 
+                        NavigationUIVisibility="Hidden" Canvas.ZIndex="0" />
+            </Canvas>
+
+        </Grid>
     </Border>
 </Window>
