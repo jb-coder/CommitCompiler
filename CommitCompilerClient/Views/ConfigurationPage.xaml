@@ -1,0 +1,229 @@
+﻿<Page x:Class="CommitCompiler.Views.ConfigurationPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:CommitCompiler.Views"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             mc:Ignorable="d"
+             Height="565" Width="850"
+             Background="Transparent">
+
+    <Border CornerRadius="12">
+        <Border.Background>
+            <ImageBrush Stretch="None"/>
+        </Border.Background>
+
+        <Border CornerRadius="10"
+                BorderThickness="2"
+                Opacity="0.95">
+
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FF1917A9" Offset="0"/>
+                    <GradientStop Color="#FF2E2DC9" Offset="0.75"/>
+                    <GradientStop Color="#FF1690C1" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                    <GradientStop Color="#060531" Offset="0"/>
+                    <GradientStop Color="#FF3660CE" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock HorizontalAlignment="Center" Height="25" TextWrapping="Wrap" Text="Configuración" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Foreground="White" Grid.Row="0"/>
+
+                <Border Background="#0B37B4" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="616" Height="500" CornerRadius="5" Grid.Row="1">
+                    <Border CornerRadius="8" BorderThickness="2" BorderBrush="Gray">
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="10">
+                                <!-- ComboBox for Project -->
+                                <Grid>
+                                    <TextBlock Text="Proyecto" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <ComboBox x:Name="comboProject" 
+                                                    Width="200" Height="30"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    ItemsSource="{Binding CbProjectItems}"
+                                                    SelectedItem="{Binding SelectedCbProjectItem, Mode=TwoWay}"
+                                                    Style="{StaticResource CustomComboBoxStyle}"/>
+                                </Grid>
+                                <!-- ComboBox for Repository -->
+                                <Grid>
+                                    <TextBlock Text="Repositorio" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <ComboBox x:Name="comboRepository" 
+                                                    Width="200" Height="30"
+                                                    Margin="0,5,0,0" 
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    ItemsSource="{Binding CbRepoItems}"
+                                                    SelectedItem="{Binding SelectedCbRepoItem, Mode=TwoWay}"
+                                                    Style="{StaticResource CustomComboBoxStyle}"/>
+                                </Grid>
+                                <!-- ComboBox for Branch -->
+                                <Grid>
+                                    <TextBlock Text="Rama" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <ComboBox x:Name="comboBranch" 
+                                                    Width="200" Height="30"
+                                                    Margin="0,5,0,0" 
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    ItemsSource="{Binding CbBranchItems}"
+                                                    SelectedItem="{Binding SelectedCbBranchItem, Mode=TwoWay}"
+                                                    Style="{StaticResource CustomComboBoxStyle}"/>
+                                </Grid>
+                                <!-- Additional Fields -->
+                                <Grid>
+                                    <TextBlock Text="Email Origen" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <TextBox x:Name="textBoxSenderEmail" 
+                                                    Margin="0,5,0,0" 
+                                                    Width="200" 
+                                                    Background="#4A90E2"
+                                                    Text="{Binding SenderEmail}"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Contraseña Email Origen" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <TextBox x:Name="textBoxPassEmail" 
+                                                    Margin="0,5,0,0" 
+                                                    Width="200" 
+                                                    Background="#4A90E2"
+                                                    Text="{Binding PassEmail}"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Email Destino" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <TextBox x:Name="textBoxRecipientEmail" 
+                                                    Margin="0,5,0,0" 
+                                                    Width="200" 
+                                                    Background="#4A90E2"
+                                                    Text="{Binding RecipientEmail}"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Email asunto" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <TextBox x:Name="textBoxEmailSubject" 
+                                                    Margin="0,5,0,0" 
+                                                    Width="200" 
+                                                    Background="#4A90E2"
+                                                    Text="{Binding EmailSubject}"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Fecha Inicio Proceso" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <hc:DateTimePicker x:Name="datePickerStartDate" 
+                                                    Height="20"
+                                                    Margin="0,5,0,0" 
+                                                    Width="200" 
+                                                    DateTimeFormat="dd/MM/yyyy HH:mm"
+                                                    SelectedDateTime="{Binding StartDate, Mode=TwoWay}" 
+                                                    Background="#4A90E2"
+                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Fecha Fin Proceso" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <hc:DateTimePicker x:Name="datePickerEndDate" 
+                                                Height="20"
+                                                Margin="0,5,0,0" 
+                                                Width="200" 
+                                                DateTimeFormat="dd/MM/yyyy HH:mm"
+                                                SelectedDateTime="{Binding EndDate, Mode=TwoWay}" 
+                                                Background="#4A90E2"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Ruta destino" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <TextBox x:Name="textPath" 
+                                                    Margin="0,5,0,0" 
+                                                    Width="200" 
+                                                    Background="#4A90E2"
+                                                    Text="{Binding Path}"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Tiempo Proceso" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                    <TextBox x:Name="textBoxProcessTime" 
+                                                    Margin="0,5,0,0" 
+                                                    Width="200" 
+                                                    Background="#4A90E2"
+                                                    Text="{Binding ProcessTime}"/>
+                                </Grid>
+                                <Grid>
+                                    <CheckBox x:Name="checkBoxAutoMerge" 
+                                                    Content="Auto Merge" 
+                                                    IsChecked="{Binding AutoMerge}"
+                                                    VerticalAlignment="Center" 
+                                                    Foreground="Gray"
+                                                    Margin="5,0,0,0"/>
+                                </Grid>
+                                <Grid Visibility="{Binding AutoMerge, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="31*"/>
+                                        <ColumnDefinition Width="559*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Rama Destino" Foreground="Gray" VerticalAlignment="Center" Margin="5,0,0,0" Grid.ColumnSpan="2"/>
+                                    <ComboBox x:Name="comboDestinationBranch" 
+                                                    Width="200" Height="30"
+                                                    Margin="164,5,0,0" 
+                                                    VerticalAlignment="Top"
+                                                    HorizontalAlignment="Left"
+                                                    ItemsSource="{Binding CbBranchItems}"
+                                                    SelectedItem="{Binding SelectedCbBranchMergeItem, Mode=TwoWay}"
+                                                    Style="{StaticResource CustomComboBoxStyle}" Grid.Column="1"/>
+                                </Grid>
+
+                                <!-- Save Button -->
+
+                                <Button x:Name="btnSave"
+                                            Content="Grabar"
+                                            BorderThickness="0"
+                                            Foreground="White"
+                                            FontSize="12"
+                                            FontFamily="Montserrat"
+                                            Cursor="Hand"
+                                            Margin="0,10,0,0"
+                                            Height="50" Width="100"
+                                            Command="{Binding SaveCommand}">
+
+                                    <!-- Estilo del botón -->
+                                    <Button.Style>
+                                        <Style TargetType="{x:Type Button}">
+                                            <Setter Property="Background" Value="#FF2800FA"/>
+                                            <Style.Triggers>
+                                                <!-- Mantener el color cuando el botón está seleccionado -->
+                                                <DataTrigger Binding="{Binding IsInicioSelected}" Value="True">
+                                                    <Setter Property="Background" Value="#28AEED"/>
+                                                </DataTrigger>
+                                                <!-- Cambiar el color cuando se pasa el ratón por encima -->
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#28AEED"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+
+                                    <!-- Template personalizado -->
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border Width="100" Height="40" CornerRadius="20"
+                                                        Background="{TemplateBinding Background}">
+                                                <ContentPresenter VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Button.Template>
+
+                                </Button>
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Border>
+            </Grid>
+        </Border>
+    </Border>
+</Page>

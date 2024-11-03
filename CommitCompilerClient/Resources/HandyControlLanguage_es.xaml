@@ -1,0 +1,14 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Traducciones para HandyControl -->
+    <sys:String x:Key="确定">Aceptar</sys:String>
+    <sys:String x:Key="取消">Cancelar</sys:String>
+    <sys:String x:Key="上午">AM</sys:String>
+    <sys:String x:Key="下午">PM</sys:String>
+    <sys:String x:Key="年">Año</sys:String>
+    <sys:String x:Key="月">Mes</sys:String>
+    <sys:String x:Key="日">Día</sys:String>
+
+</ResourceDictionary>
