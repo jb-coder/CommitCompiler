@@ -1,105 +1,208 @@
-﻿using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.VisualStudio.Services.Common;
-using Microsoft.VisualStudio.Services.WebApi;
-using System;
-using System.Collections.Generic;
+﻿using CommitCompilerShared.Data;
+using CommitCompilerShared.Models;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.Mail;
 
-namespace CommitCompiler.Services
+namespace CommitCompilerShared.Services
 {
-    public class AzureDevOpsService
+    public class BuildService
     {
-        private readonly VssConnection _connection;
-        private readonly GitHttpClient _gitClient;
-        private readonly ProjectHttpClient _projectClient;
-        public AzureDevOpsService(string organization, string personalAccessToken)
+        private readonly CommitCompilerContext _dbContext;
+        private readonly HttpClient _httpClient;
+
+        public BuildService(CommitCompilerContext dbContext)
         {
-            // Establecer la conexión con Azure DevOps usando un PAT (Personal Access Token)
-            var credentials = new VssBasicCredential(string.Empty, personalAccessToken);
-            string uri = "https://dev.azure.com/" + organization;
-
-            _connection = new VssConnection(new Uri(uri), credentials);
-
-            // Inicializar los clientes para proyectos y repositorios
-            _gitClient = _connection.GetClient<GitHttpClient>();
-            _projectClient = _connection.GetClient<ProjectHttpClient>();
+            _dbContext = dbContext;
+            _httpClient = new HttpClient();
         }
 
-        // Obtener todos los proyectos de la organización
-        public async Task<List<TeamProjectReference>> GetProjectsAsync()
+        public async Task ExecuteBuildProcess()
         {
-            var projects = await _projectClient.GetProjects();
-            return projects.ToList();
+            var buildConfigurations = await _dbContext.BuildConfigurations
+                .OrderByDescending(b => b.Id)
+                .ToListAsync();
+
+            if (buildConfigurations == null || !buildConfigurations.Any())
+            {
+                Console.WriteLine("No se ha encontrado ninguna configuración");
+                return;
+            }
+
+            foreach (var config in buildConfigurations)
+            {
+                try
+                {
+                    Console.WriteLine($"Procesando configuración para el proyecto: {config.Repository}");
+                    string repositoryPath = @"C:\Temp\Compilaciones";
+                    Directory.CreateDirectory(repositoryPath);
+
+                    // Verificar si hay nuevos commits y descargar si es necesario
+                    bool hasNewCommits = await CheckForNewCommits(config.Repository, config.Branch, config.Token);
+
+                    if (hasNewCommits)
+                    {
+                        CompileProject(config.PathDestination);
+                        await SendNotification(config);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No hay nuevos commits en la rama.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error durante el proceso de compilación: {ex.Message}");
+                }
+            }
         }
 
-        // Obtener los repositorios de un proyecto
-        public async Task<List<GitRepository>> GetRepositoriesAsync(string projectName)
-        {
-            List<GitRepository> repositories = await _gitClient.GetRepositoriesAsync(projectName);
-            return repositories;
-        }
-        // Obtener los commits de un repositorio (Sin criterios adicionales)
-        public async Task<List<GitCommitRef>> GetCommitsAsync(string projectName, string repositoryId)
-        {
-            // La sobrecarga correcta que no requiere un criterio explícito
-            List<GitCommitRef> commits = await _gitClient.GetCommitsAsync(projectName, repositoryId, new GitQueryCommitsCriteria());
-            return commits;
-        }
-
-        // Obtener las ramas (refs/heads) de un repositorio
-        public async Task<List<GitRef>> GetBranchesAsync(string projectName, string repositoryId)
-        {
-            List<GitRef> branches = await _gitClient.GetRefsAsync(projectName, repositoryId, filter: "heads/");
-            return branches;
-        }
-
-        // Obtener los commits de una rama específica en un repositorio
-        public async Task<List<GitCommitRef>> GetCommitsByBranchAsync(string projectName, string repositoryId, string branchName, DateTime startDate, DateTime endDate)
+        private async Task<bool> CheckForNewCommits(string repoUrl, string branch, string token)
         {
             try
             {
-                // Asegurarse de que la fecha de inicio no sea posterior a la fecha de fin
-                if (startDate > endDate)
-                {
-                    throw new ArgumentException("La fecha de inicio no puede ser posterior a la fecha de fin.");
-                }
+                // Autenticación utilizando el token de acceso personal (PAT)
+                string pat = token;
+                string baseUrl = "https://dev.azure.com"; // URL base de Azure DevOps
+                string organization = "your-organization"; // Cambia esto por tu organización en Azure DevOps
+                string project = "your-project"; // Cambia esto por tu proyecto en Azure DevOps
+                string repository = "your-repo"; // Cambia esto por el nombre de tu repositorio
 
-                // Definir los criterios de búsqueda basados en el ObjectId de la rama
-                GitQueryCommitsCriteria criteria = new GitQueryCommitsCriteria
+                // Configurar las cabeceras de autenticación para Azure DevOps
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($":{pat}")));
+
+                // Llamada a la API REST de Azure DevOps para obtener el último commit en la rama
+                string url = $"{baseUrl}/{organization}/{project}/_apis/git/repositories/{repository}/commits?searchCriteria.itemVersion.version={branch}&$top=1&api-version=7.1-preview.1";
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    ItemVersion = new GitVersionDescriptor
+                    var commits = await response.Content.ReadAsAsync<dynamic>();
+
+                    // Si no hay commits, devolver false
+                    if (commits.count == 0)
                     {
-                        VersionType = GitVersionType.Branch,
-                        Version = branchName
-                    },
-                    Top = 10000,  // Establecemos un límite en la cantidad de commits a devolver
-                    FromDate = startDate.ToString("o"), // Formato de fecha ISO 8601
-                    ToDate = endDate.ToString("o")      // Formato de fecha ISO 8601
-                };
+                        Console.WriteLine("No se encontraron commits en la rama.");
+                        return false;
+                    }
 
-                // Llamada a la API para obtener los commits filtrados
-                List<GitCommitRef> filteredCommits = await _gitClient.GetCommitsAsync(projectName, repositoryId, criteria);
+                    // Comprobar si hay un nuevo commit (compara el último commit remoto con el commit local)
+                    var latestCommit = commits.value[0].commitId;
+                    var localCommitId = GetLocalCommitId(repoUrl, branch);
 
-                if (filteredCommits.Count == 0)
-                {
-                    throw new Exception("No se encontraron commits en el rango de fechas especificado.");
+                    return localCommitId != latestCommit;
                 }
-
-                // Devolver los commits encontrados
-                return filteredCommits;
+                else
+                {
+                    Console.WriteLine("Error al obtener los commits.");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
-                // Capturar cualquier excepción y mostrar el error
-                Console.WriteLine($"Error al obtener commits: {ex.Message}");
-                throw;
+                Console.WriteLine($"Error al verificar commits: {ex.Message}");
+                return false;
             }
         }
 
+        private string GetLocalCommitId(string repoPath, string branch)
+        {
+            // Aquí debes implementar la lógica para obtener el último commit de la rama local
+            // Usando comandos Git a través de Process Start (por ejemplo, git rev-parse HEAD)
+            return string.Empty;
+        }
 
+        private async Task CloneRepository(string repoUrl, string localPath, string token)
+        {
+            try
+            {
+                string baseUrl = "https://dev.azure.com";
+                string organization = "your-organization"; // Cambia esto por tu organización
+                string project = "your-project"; // Cambia esto por tu proyecto
+                string repository = "your-repo"; // Cambia esto por el nombre de tu repositorio
 
+                // Autenticación utilizando el token de acceso personal (PAT)
+                string cloneUrl = $"{baseUrl}/{organization}/{project}/_git/{repository}";
+                string cloneCommand = $"git clone https://{organization}:{token}@dev.azure.com/{organization}/{project}/_git/{repository} {localPath}";
 
+                // Ejecutar el comando git clone
+                Console.WriteLine("Clonando el repositorio...");
+                await Task.Run(() => Process.Start("git", cloneCommand));
+                Console.WriteLine("Repositorio clonado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al clonar el repositorio: {ex.Message}");
+            }
+        }
 
+        private void CompileProject(string outputPath)
+        {
+            Console.WriteLine($"Compilando el proyecto en {outputPath}...");
+
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"publish -c Release -o {outputPath}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(processInfo))
+            {
+                if (process != null)
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        Console.WriteLine($"Error en la compilación: {error}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Compilación completada exitosamente.");
+                    }
+                }
+            }
+        }
+
+        private async Task SendNotification(BuildConfiguration config)
+        {
+            try
+            {
+                using (var client = new SmtpClient("smtp.example.com", 587))
+                {
+                    client.EnableSsl = true;
+                    client.Credentials = new NetworkCredential(config.EmailOriginSender, config.EmailOriginPass);
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(config.EmailOriginSender),
+                        Subject = config.EmailDestinationSubject,
+                        Body = "El proyecto ha sido compilado y actualizado correctamente.",
+                        IsBodyHtml = true
+                    };
+
+                    mailMessage.To.Add(config.EmailDestination);
+
+                    await client.SendMailAsync(mailMessage);
+                    Console.WriteLine("Notificación enviada con éxito.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al enviar notificación: {ex.Message}");
+            }
+        }
     }
 }

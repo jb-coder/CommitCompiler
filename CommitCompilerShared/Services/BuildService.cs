@@ -1,101 +1,209 @@
 ﻿using CommitCompilerShared.Data;
 using CommitCompilerShared.Models;
-using LibGit2Sharp;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.Mail;
 
 namespace CommitCompilerShared.Services
 {
     public class BuildService
     {
-    private readonly CommitCompilerContext _dbContext;
+        private readonly CommitCompilerContext _dbContext;
+        private readonly HttpClient _httpClient;
 
-    public BuildService(CommitCompilerContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public async Task ExecuteBuildProcess()
-    {
-        // Obtiene la configuración más reciente
-        var buildConfiguration = await _dbContext.BuildConfigurations
-            .OrderByDescending(b => b.Id)
-            .FirstOrDefaultAsync();
-
-        if (buildConfiguration != null)
+        public BuildService(CommitCompilerContext dbContext)
         {
-            // Configuraciones de Git
-            string repositoryPath = "C:/"; // Ruta local del repositorio
-            string branch = buildConfiguration.Branch; // Rama a verificar
-            string destinationPath = buildConfiguration.PathDestination; // Ruta de destino para la compilación
+            _dbContext = dbContext;
+            _httpClient = new HttpClient();
+        }
 
-            // Verifica nuevos commits
-            bool hasNewCommits = await CheckForNewCommits(repositoryPath, branch, buildConfiguration.Token);
+        public async Task ExecuteBuildProcess()
+        {
+            var buildConfigurations = await _dbContext.BuildConfigurations
+                .OrderByDescending(b => b.Id)
+                .ToListAsync();
 
-            if (hasNewCommits)
+            if (buildConfigurations == null || !buildConfigurations.Any())
             {
-                // Lógica de compilación
-                CompileProject(destinationPath);
-
-                // Enviar notificación
-                await SendNotification(buildConfiguration);
+                Console.WriteLine("No se ha encontrado ninguna configuración");
+                return;
             }
-            else
+
+            foreach (var config in buildConfigurations)
             {
-                Console.WriteLine("No hay nuevos commits en la rama.");
+                try
+                {
+                    Console.WriteLine($"Procesando configuración para el proyecto: {config.Repository}");
+                    string repositoryPath = @"C:\Temp\Compilaciones";
+                    Directory.CreateDirectory(repositoryPath);
+
+                    // Verificar si hay nuevos commits y descargar si es necesario
+                    bool hasNewCommits = await CheckForNewCommits(config);
+
+                    if (hasNewCommits)
+                    {
+                        CompileProject(config.PathDestination);
+                        await SendNotification(config);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No hay nuevos commits en la rama.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error durante el proceso de compilación: {ex.Message}");
+                }
             }
         }
-        else
-        {
-            Console.WriteLine("No se encontró configuración de compilación.");
-        }
-    }
 
-    private async Task<bool> CheckForNewCommits(string repoPath, string branch, string token)
-    {
-        // Aquí implementas la lógica para conectarte a Git y verificar nuevos commits.
-        using (var repo = new Repository(repoPath))
+        private async Task<bool> CheckForNewCommits(BuildConfiguration config)
         {
-            var remote = repo.Network.Remotes.FirstOrDefault();
-            var branchRef = repo.Branches[branch];
-
-            if (branchRef == null)
+            try
             {
-                Console.WriteLine("La rama especificada no existe.");
+                // Autenticación utilizando el token de acceso personal (PAT)
+                string pat = config.Token;
+                string baseUrl = "https://dev.azure.com"; // URL base de Azure DevOps
+                string organization = config.Organization;
+                string project = config.Project;
+                string repository = config.Repository;
+                string branch = config.Branch;
+
+                // Configurar las cabeceras de autenticación para Azure DevOps
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($":{pat}")));
+
+                // Llamada a la API REST de Azure DevOps para obtener el último commit en la rama
+                string url = $"{baseUrl}/{organization}/{project}/_apis/git/repositories/{repository}/commits?searchCriteria.itemVersion.version={branch}&$top=1&api-version=7.1-preview.1";
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var commits = await response.Content.ReadAsAsync<dynamic>();
+
+                    // Si no hay commits, devolver false
+                    if (commits.count == 0)
+                    {
+                        Console.WriteLine("No se encontraron commits en la rama.");
+                        return false;
+                    }
+
+                    // Comprobar si hay un nuevo commit (compara el último commit remoto con el commit local)
+                    var latestCommit = commits.value[0].commitId;
+                    var localCommitId = GetLocalCommitId(repository, branch);
+
+                    return localCommitId != latestCommit;
+                }
+                else
+                {
+                    Console.WriteLine("Error al obtener los commits.");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al verificar commits: {ex.Message}");
                 return false;
             }
-
-            // Fetch para actualizar la información del remoto
-            Commands.Fetch(repo, remote.Name, null, null, null);
-
-            // Compara los commits
-            var localCommit = branchRef.Commits.First();
-            var remoteCommit = repo.Branches[$"origin/{branch}"].Commits.First();
-
-            return localCommit.Id != remoteCommit.Id; // Hay un nuevo commit
         }
-    }
 
-    private void CompileProject(string path)
-    {
-        // Aquí implementaremos la lógica para compilar el proyecto.
-        Console.WriteLine($"Compilando el proyecto en {path}...");
+        private string GetLocalCommitId(string repoPath, string branch)
+        {
+            // Aquí debes implementar la lógica para obtener el último commit de la rama local
+            // Usando comandos Git a través de Process Start (por ejemplo, git rev-parse HEAD)
+            return string.Empty;
+        }
 
-        //Logica Compilacion *************
-                
+        private async Task CloneRepository(string repoUrl, string localPath, string token)
+        {
+            try
+            {
+                string baseUrl = "https://dev.azure.com";
+                string organization = "your-organization"; // Cambia esto por tu organización
+                string project = "your-project"; // Cambia esto por tu proyecto
+                string repository = "your-repo"; // Cambia esto por el nombre de tu repositorio
 
-        Console.WriteLine("Compilación completada.");
-    }
+                // Autenticación utilizando el token de acceso personal (PAT)
+                string cloneUrl = $"{baseUrl}/{organization}/{project}/_git/{repository}";
+                string cloneCommand = $"git clone https://{organization}:{token}@dev.azure.com/{organization}/{project}/_git/{repository} {localPath}";
 
-    private async Task SendNotification(BuildConfiguration config)
-    {
-        // Lógica para enviar un mensaje.
-        Console.WriteLine($"Enviando notificación a {config.EmailDestination}...");
-        // Código para enviar el correo (MailKit o System.Net.Mail).
+                // Ejecutar el comando git clone
+                Console.WriteLine("Clonando el repositorio...");
+                await Task.Run(() => Process.Start("git", cloneCommand));
+                Console.WriteLine("Repositorio clonado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al clonar el repositorio: {ex.Message}");
+            }
+        }
 
-        // Envio De mail *******************
+        private void CompileProject(string outputPath)
+        {
+            Console.WriteLine($"Compilando el proyecto en {outputPath}...");
 
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"publish -c Release -o {outputPath}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-        Console.WriteLine("Notificación enviada.");
-    }
+            using (var process = Process.Start(processInfo))
+            {
+                if (process != null)
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    string error = process.StandardError.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode != 0)
+                    {
+                        Console.WriteLine($"Error en la compilación: {error}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Compilación completada exitosamente.");
+                    }
+                }
+            }
+        }
+
+        private async Task SendNotification(BuildConfiguration config)
+        {
+            try
+            {
+                using (var client = new SmtpClient("smtp.example.com", 587))
+                {
+                    client.EnableSsl = true;
+                    client.Credentials = new NetworkCredential(config.EmailOriginSender, config.EmailOriginPass);
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(config.EmailOriginSender),
+                        Subject = config.EmailDestinationSubject,
+                        Body = "El proyecto ha sido compilado y actualizado correctamente.",
+                        IsBodyHtml = true
+                    };
+
+                    mailMessage.To.Add(config.EmailDestination);
+
+                    await client.SendMailAsync(mailMessage);
+                    Console.WriteLine("Notificación enviada con éxito.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al enviar notificación: {ex.Message}");
+            }
+        }
     }
 }

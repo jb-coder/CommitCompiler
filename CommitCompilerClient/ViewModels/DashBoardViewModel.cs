@@ -3,23 +3,9 @@ using CommitCompiler.Services.Interface;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using LiveCharts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Windows.Media;
-using CommitCompiler.Models;
-using System.Windows.Controls;
-using System.ComponentModel;
-using CommitCompiler.Views;
-using Microsoft.VisualStudio.Services.Common;
 using System.Collections.ObjectModel;
-using Newtonsoft.Json;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.Azure.Pipelines.WebApi;
-using HandyControl.Tools;
 using Microsoft.TeamFoundation.Core.WebApi;
 
 namespace CommitCompiler.ViewModels

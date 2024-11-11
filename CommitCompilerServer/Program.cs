@@ -7,7 +7,9 @@ class Program
     {
         CommitCompilerContext context = new CommitCompilerContext();
         var buildService = new BuildService(context);
-
-        await buildService.ExecuteBuildProcess();
+        while (true)
+        {
+            await buildService.ExecuteBuildProcess();
+        }
     }
 }
