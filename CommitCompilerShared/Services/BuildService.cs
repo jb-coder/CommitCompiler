@@ -24,25 +24,29 @@ namespace CommitCompilerShared.Services
 
         public async Task ExecuteBuildProcess()
         {
+            //Obtenemos la lista de configuraciones
             var buildConfigurations = await _dbContext.BuildConfigurations
                 .OrderByDescending(b => b.Id)
                 .ToListAsync();
 
+            //Si no hay ninguna salimos
             if (buildConfigurations == null || !buildConfigurations.Any())
             {
                 Console.WriteLine("No se ha encontrado ninguna configuración");
                 return;
             }
-
+            //Recorremos las configuraciones
             foreach (var config in buildConfigurations)
             {
                 try
                 {
                     Console.WriteLine($"Procesando configuración para el proyecto: {config.Repository}");
                     string repositoryPath = @"C:\Temp\Compilaciones";
+
+                    //Creamos el directorio temporal para descargar los proyectos
                     Directory.CreateDirectory(repositoryPath);
 
-                    // Verificar si hay nuevos commits y descargar si es necesario
+                    // Verificamos si hay nuevos commits y descargamos si es necesario
                     bool hasNewCommits = await CheckForNewCommits(config);
 
                     if (hasNewCommits)
